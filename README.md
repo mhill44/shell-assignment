@@ -1,2 +1,17 @@
-# shell-assignment
-the shell assignment. we have the shell running, though it has NO functions built in functions to use it with, not even ls or echo.  will flesh out. important thing is, its up and running and compiled with no errors. also created both static and dynamic libraries, .o object files, and the resulting executable binary just named shell. (./shell will launch it). libraries are indexed with ranlib.
+Chad Calvert, Matt Hill and Mikey Shrier's simple shell project!
+
+This shell works in both interactive and non-interactive mode. It serves as a command line interface terminal to interact with your computer, much like the bash program found on almost all linux/unix systems. For more details on functionality, please reference man(bash).
+
+To compile, run the following in your existing shell terminal:
+
+$ gcc -Wall -Werror -Wextra -pedantic *.c -o hsh
+
+and then run the program in interactive mode by entering
+
+$ ./hsh
+
+or non-interactive mode by entering, for example,
+
+$ echo "/bin/ls" | ./hsh
+
+Thank you for viewing our project!

@@ -1,95 +1,51 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
-#include <string.h>
 #include "shell.h"
 
-int main(int argc, char **argv)
+/**
+ * main - main function for the shell
+ * Return: 0
+ */
+
+int main(void)
 {
-    char *cmd;
+	char **arr, *cmd = NULL;
+	size_t n = 0;
+	ssize_t strin = 0;
+	int ecode = 0, i;
 
-    do
-    {
-        print_prompt1();
-
-        cmd = read_cmd();
-
-        if(!cmd)
-        {
-            exit(EXIT_SUCCESS);
-        }
-
-        if(cmd[0] == '\0' || strcmp(cmd, "\n") == 0)
-        {
-            free(cmd);
-            continue;
-        }
-
-        if(strcmp(cmd, "exit\n") == 0)
-        {
-            free(cmd);
-            break;
-        }
-
-        printf("%s\n", cmd);
-
-        free(cmd);
-
-    } while(1);
-
-    exit(EXIT_SUCCESS);
-}
-char *read_cmd(void)
-{
-    char buf[1024];
-    char *ptr = NULL;
-    char ptrlen = 0;
-
-    while(fgets(buf, 1024, stdin))
-    {
-        int buflen = strlen(buf);
-
-        if(!ptr)
-        {
-            ptr = malloc(buflen+1);
-        }
-        else
-        {
-            char *ptr2 = realloc(ptr, ptrlen+buflen+1);
-
-            if(ptr2)
-            {
-                ptr = ptr2;
-            }
-            else
-            {
-                free(ptr);
-                ptr = NULL;
-            }
-        }
-
-        if(!ptr)
-        {
-            fprintf(stderr, "error: failed to alloc buffer: %s\n", strerror(errno));
-            return NULL;
-        }
-
-        strcpy(ptr+ptrlen, buf);
-
-        if(buf[buflen-1] == '\n')
-        {
-            if(buflen == 1 || buf[buflen-2] != '\\')
-            {
-                return ptr;
-            }
-
-            ptr[ptrlen+buflen-2] = '\0';
-            buflen -= 2;
-            print_prompt2();
-        }
-
-        ptrlen += buflen;
-    }
-
-    return ptr;
+	do {
+	i = 0;
+	if (isatty(STDIN_FILENO))
+	write(STDOUT_FILENO, "$ ", 2);
+	signal(SIGINT, stopcc);
+	strin = getline(&cmd, &n, stdin);
+	if (strin == EOF)
+	break;
+	cmd[strin - 1] = '\0';
+	arr = delim(cmd, " ");
+	if (arr == NULL)
+	continue;
+	if (strcmp(arr[0], "exit") == 0)
+	{
+	while (arr[i])
+	free(arr[i++]);
+	free(arr);
+	break;
+	}
+	if (strcmp(arr[0], "env") == 0)
+	{
+	penv();
+	while (arr[i])
+	free(arr[i++]);
+	free(arr);
+	continue;
+	}
+	pfind(arr), ecode = exec(arr);
+	while (arr[i])
+	free(arr[i++]);
+	free(arr);
+	} while (1);
+	free(cmd);
+	return (ecode);
 }
